@@ -1,0 +1,67 @@
+{
+  "format_version": 2,
+
+  "server": {
+    "heart_beat_timeout": 1000
+  },
+  "task_data_filters": [],
+  "task_result_filters": [],
+  "components": [
+    {
+      "id": "persistor",
+      "name": "PTFileModelPersistor",
+      "args": {
+        "model": {
+          "path": "simple_network.SimpleNetwork"
+        }
+      }
+    },
+    {
+      "id": "shareable_generator",
+      "name": "HEModelShareableGenerator",
+      "args": {}
+    },
+    {
+      "id": "aggregator",
+      "name": "HEInTimeAccumulateWeightedAggregator",
+      "args": {}
+    },
+    {
+      "id": "model_locator",
+      "path": "pt_model_locator.PTModelLocator",
+      "args": {
+
+      }
+    },
+    {
+      "id": "json_generator",
+      "path": "validation_json_generator.ValidationJsonGenerator",
+      "args": {
+      }
+    }
+  ],
+  "workflows": [
+      {
+        "id": "scatter_gather_ctl",
+        "name": "ScatterAndGather",
+        "args": {
+            "min_clients" : 1,
+            "num_rounds" : 5,
+            "start_round": 0,
+            "wait_time_after_min_received": 10,
+            "aggregator_id": "aggregator",
+            "persistor_id": "persistor",
+            "shareable_generator_id": "shareable_generator",
+            "train_task_name": "train",
+            "train_timeout": 0
+        }
+      },
+      {
+        "id": "cross_site_validate",
+        "name": "CrossSiteModelEval",
+        "args": {
+          "model_locator_id": "model_locator"
+        }
+      }
+  ]
+}
